@@ -43,6 +43,9 @@ namespace E_Commerce
             #region Part 07 DbContext And Configuration
 
             #endregion
+            #region Part 07 DbContext And Configuration
+
+            #endregion
         }
     }
 }
