@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Presistance;
 using Presistance.Data;
 using Presistance.Repositories;
+using Services;
+using Services.Abstractions;
 
 namespace E_Commerce
 {
@@ -15,7 +17,7 @@ namespace E_Commerce
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
 
             #region Configure Services
             builder.Services.AddDbContext<StoreContext>(options =>
@@ -24,6 +26,7 @@ namespace E_Commerce
             });
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IServiceManager, ServiceManager>();
             builder.Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
             #endregion
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -40,7 +43,7 @@ namespace E_Commerce
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
@@ -56,6 +59,9 @@ namespace E_Commerce
 
             #endregion
             #region Part 02 Product Service & Service Manager.
+
+            #endregion
+            #region Part 02 PginatedResult
 
             #endregion
             async Task InitializeDbAsync (WebApplication app)
