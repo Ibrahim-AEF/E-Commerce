@@ -21,11 +21,19 @@ namespace Services
             return BrandsResult;
         }
 
-        public async Task<IEnumerable<ProductResultDto>> GetAllProductsAsync()
+        public async Task<PaginatedResult<ProductResultDto>> GetAllProductsAsync(ProductSpecificationsParameters parameters)
         {
-            var Products = await unitOfWork.GetRepository<Product, int>().GetAllWithSpecificationAsync(new ProductWithBrandAndProductSpecifications());
+            var Products = await unitOfWork.GetRepository<Product, int>().GetAllWithSpecificationAsync(new ProductWithBrandAndProductSpecifications(parameters));
             var ProductResult = Mapper.Map<IEnumerable<ProductResultDto>>(Products);
-            return ProductResult;
+            var TotalCount = ProductResult.Count();
+            var Result = new PaginatedResult<ProductResultDto>
+                (
+                parameters.pageIndex,
+                parameters.PageSize,
+                TotalCount,
+                ProductResult
+                );
+            return Result;
         }
 
         public async Task<IEnumerable<TypeResultDto>> GetAllTypesAsync()

@@ -64,6 +64,9 @@ namespace E_Commerce
             #region Part 02 PginatedResult
 
             #endregion
+            #region Part 02 PginatedResult
+
+            #endregion
             async Task InitializeDbAsync (WebApplication app)
             {
                 //Create Object From Type That Implements IDbinitializer
