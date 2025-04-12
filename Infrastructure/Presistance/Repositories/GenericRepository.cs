@@ -26,16 +26,28 @@ namespace Presistance.Repositories
            => await _storeContext.Set<TEntity>().FindAsync(Id);
         
         public async Task AddAsync(TEntity entity)
-        {
+        =>
             await _storeContext.Set<TEntity>().AddAsync(entity);
-        }
+        
         public void Update(TEntity entity)
-        {
+        =>
             _storeContext.Set<TEntity>().Update(entity);
-        }
+        
         public void Delete(TEntity entity)
-        {
+        =>
             _storeContext.Set<TEntity>().Remove(entity);
-        }
+
+        #region For Specification
+        public async Task<IEnumerable<TEntity>> GetAllWithSpecificationAsync(Specifications<TEntity> specifications)
+        => await ApplySpecifications(specifications).ToListAsync();
+        public async Task<TEntity?> GetByIdWithSpecificationAsync(Specifications<TEntity> specifications)
+        => await ApplySpecifications(specifications).FirstOrDefaultAsync();
+
+            private IQueryable<TEntity> ApplySpecifications(Specifications<TEntity> specifications)
+            => SpecificationEvaluator.GetQuery(_storeContext.Set<TEntity>(), specifications);
+
+        public async Task<int> CountAsync(Specifications<TEntity> specifications)
+        => await SpecificationEvaluator.GetQuery(_storeContext.Set<TEntity>(), specifications).CountAsync();
+        #endregion
     }
 }
