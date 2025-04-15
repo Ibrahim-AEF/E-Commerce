@@ -20,7 +20,7 @@ namespace Shared
             get => _pageSize;
             set => _pageSize = value > MaximumPageSize ? MaximumPageSize : value;
         }
-
+        public string? Search { get; set; }
 
     }
     public enum ProductSpecificationSort
