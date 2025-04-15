@@ -13,7 +13,7 @@ namespace Services.MappingProfiles
     {
         public BasketProfile()
         {
-            CreateMap<CustomerBasket, BasketItemDto>().ReverseMap();
+            CreateMap<CustomerBasket, BasketDto>().ReverseMap();
             CreateMap<BasketItem, BasketItemDto>().ReverseMap();
         }
     }
