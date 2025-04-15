@@ -1,5 +1,9 @@
 
 using Domain.Contracts;
+using E_Commerce.Extensions;
+using E_Commerce.Factories;
+using E_Commerce.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Presistance;
 using Presistance.Data;
@@ -16,27 +20,22 @@ namespace E_Commerce
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services.AddControllers().AddApplicationPart(typeof(Presentation.AssemblyReference).Assembly);
-
             #region Configure Services
-            builder.Services.AddDbContext<StoreContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IServiceManager, ServiceManager>();
-            builder.Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
+            builder.Services.AddInfraStructureService(builder.Configuration);
+
+            builder.Services.AddCoreServices();
+
+            builder.Services.AddPresentationServices();
             #endregion
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-            await InitializeDbAsync(app);
 
-
+            #region MiddleWare
+            await app.SeedDbAsync();
+            app.UseCustomMiddleWareExceptions();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -52,6 +51,7 @@ namespace E_Commerce
             app.MapControllers();
 
             app.Run();
+            #endregion
             #region Part 07 DbContext And Configuration
 
             #endregion
@@ -67,13 +67,10 @@ namespace E_Commerce
             #region Part 02 PginatedResult
 
             #endregion
-            async Task InitializeDbAsync (WebApplication app)
-            {
-                //Create Object From Type That Implements IDbinitializer
-                using var Scope = app.Services.CreateScope();
-                var dbinitializer = Scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-                await dbinitializer.InitializeAsync();
-            }
+            #region Part 05 Basket Controller
+
+            #endregion
+
         }
     }
 }

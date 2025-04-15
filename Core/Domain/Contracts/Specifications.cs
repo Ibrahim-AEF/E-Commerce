@@ -25,6 +25,7 @@ namespace Domain.Contracts
         public int Skip { get; set; }
         public int Take { get; set; }
         public bool IsPaginated { get; set; }
+        
         #endregion
         protected void AddInclude(Expression<Func<T, object>> expression)
             => IncludeExpressions.Add(expression);
