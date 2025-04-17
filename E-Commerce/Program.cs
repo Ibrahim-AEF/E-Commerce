@@ -73,7 +73,9 @@ namespace E_Commerce
             #region Part 05 Basket Controller
 
             #endregion
+            #region Part 04 Authentication Controller
 
+            #endregion
         }
     }
 }
