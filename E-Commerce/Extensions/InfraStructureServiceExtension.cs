@@ -7,6 +7,10 @@ using System.Reflection.Metadata.Ecma335;
 using StackExchange.Redis;
 using Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
+using Shared.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace E_Commerce.Extensions
 {
@@ -28,6 +32,7 @@ namespace E_Commerce.Extensions
                 _=>ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
             Services.AddScoped<IBasketRepository, BasketRepository>();
             Services.ConfigureIdentityService();
+            Services.ConfigureJwt(configuration);
             return Services;
         }
         public static IServiceCollection ConfigureIdentityService(this IServiceCollection Services)
@@ -42,6 +47,28 @@ namespace E_Commerce.Extensions
             }).AddEntityFrameworkStores<StoreIdentityContext>();
             return Services;
         }
-        
+        public static IServiceCollection ConfigureJwt(this IServiceCollection Services,IConfiguration configuration)
+        {
+            var jwtoptions = configuration.GetSection("JwtOptions").Get<Jwtoptions>();
+            Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options=>
+            options.TokenValidationParameters=new TokenValidationParameters
+            {
+                ValidateIssuer=true,
+                ValidateAudience=true,
+                ValidateLifetime=true,
+                ValidateIssuerSigningKey=true,
+                ValidIssuer=jwtoptions.Issure,
+                ValidAudience=jwtoptions.Audience,
+                IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtoptions.SecretKey))
+            });
+            Services.AddAuthorization();
+            return Services;
+        }
+
+
     }
 }

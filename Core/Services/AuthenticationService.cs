@@ -1,17 +1,22 @@
 ﻿using Domain.Entities.Identity;
 using Domain.Exceptions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Services.Abstractions;
 using Shared.Security;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Services
 {
-    public class AuthenticationService(UserManager<User> userManager) : IAuthenticationService
+    public class AuthenticationService(UserManager<User> userManager,IConfiguration configuration,IOptions<Jwtoptions> options) : IAuthenticationService
     {
         public async Task<UserResultDto> LoginAsync(LoginDto loginDto)
         {
@@ -25,7 +30,7 @@ namespace Services
             return new UserResultDto(
                 User.DisplayName,
                 User.Email,
-                "Token"
+                await CreateTokenAsync(User)
                 );
         }
 
@@ -47,8 +52,34 @@ namespace Services
             return new UserResultDto(
                 User.DisplayName,
                 User.Email,
-                "Token"
+                await CreateTokenAsync(User)
                 );
+        }
+        public async Task<string> CreateTokenAsync(User user)
+        {
+            var jwtoptions = options.Value;
+            //Private Claims
+            var AuthClaims = new List<Claim>
+            { new Claim(ClaimTypes.Name,user.UserName!),
+            new Claim(ClaimTypes.Email,user.Email!)};
+            //Add Roles To Claims If Exist
+            var Roles = await userManager.GetRolesAsync(user);
+            foreach(var role in Roles)
+            {
+                AuthClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            //For Secret Key
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtoptions.SecretKey));//For Key
+            var SigningCredintials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            //Token
+            var Token = new JwtSecurityToken(
+                audience: jwtoptions.Audience,
+                issuer: jwtoptions.Issure,
+                expires: DateTime.UtcNow.AddDays(jwtoptions.DurationsInDays),
+                claims: AuthClaims,
+                signingCredentials: SigningCredintials
+                );
+            return new JwtSecurityTokenHandler().WriteToken(Token);
         }
     }
 }
