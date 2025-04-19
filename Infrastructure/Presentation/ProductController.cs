@@ -11,9 +11,7 @@ using System.Threading.Tasks;
 
 namespace Presentation
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController(IServiceManager ServiceManager):ControllerBase
+    public class ProductController(IServiceManager ServiceManager):ApiController
     {
         #region GetAllProducts
         [HttpGet("Products")]
@@ -40,10 +38,6 @@ namespace Presentation
         }
         #endregion
         #region Get Product By Id
-        [ProducesResponseType(typeof(ErrorDetails),(int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ErrorDetails), (int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType(typeof(ValidationErrorResponse), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ProductSpecificationSort), (int)HttpStatusCode.OK)]
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<ProductResultDto>>> GetProductById(int id)
         {

@@ -23,7 +23,7 @@ namespace E_Commerce
             #region Configure Services
             builder.Services.AddInfraStructureService(builder.Configuration);
 
-            builder.Services.AddCoreServices();
+            builder.Services.AddCoreServices(builder.Configuration);
 
             builder.Services.AddPresentationServices();
             #endregion
@@ -44,7 +44,7 @@ namespace E_Commerce
             }
             app.UseStaticFiles();
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
@@ -73,7 +73,9 @@ namespace E_Commerce
             #region Part 05 Basket Controller
 
             #endregion
+            #region Part 04 Authentication Controller
 
+            #endregion
         }
     }
 }
