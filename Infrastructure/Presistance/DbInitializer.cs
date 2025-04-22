@@ -1,6 +1,7 @@
 ﻿using Domain.Contracts;
 using Domain.Entities;
 using Domain.Entities.Identity;
+using Domain.Entities.OrderEntities;
 using Microsoft.AspNetCore.Identity;
 using Presistance.Data;
 using System;
@@ -76,6 +77,21 @@ namespace Presistance
                     if (Products is not null && Products.Any())
                     {
                         await _storeContext.Products.AddRangeAsync(Products);
+                        await _storeContext.SaveChangesAsync();
+                    }
+                }
+                #endregion
+                #region Delivery
+                if (!_storeContext.DeliveryMethods.Any())
+                {
+                    
+                    var DeliveryData = await File.ReadAllTextAsync(@"..\Infrastructure\Presistance\Data\Seeding\delivery.json");
+                    //Transform Into C# Objects
+                    var Data = JsonSerializer.Deserialize<List<DeliveryMethod>>(DeliveryData);
+                    //Add To Database & Save Changes
+                    if (Data is not null && Data.Any())
+                    {
+                        await _storeContext.DeliveryMethods.AddRangeAsync(Data);
                         await _storeContext.SaveChangesAsync();
                     }
                 }
